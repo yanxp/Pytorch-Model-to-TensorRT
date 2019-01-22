@@ -80,7 +80,7 @@ def onnx_infer():
     apex = onnxparser.create_onnxconfig()
     apex.set_model_file_name(args.onnx_model_name)
     apex.set_model_dtype(trt.infer.DataType.FLOAT)
-    apex.set_print_layer_info(False)
+    apex.set_print_layer_info(True)
     trt_parser = onnxparser.create_onnxparser(apex)
 
     data_type = apex.get_model_dtype()
@@ -97,7 +97,7 @@ def onnx_infer():
 
     print ("Start ONNX Test...")
     correct, total = do_test(context)
-    print ("ONNX Acc: {}".format(correct / total))
+    print ("ONNX Acc: {}".format(correct / float(total)))
 
 
 def onnx_to_int8():
@@ -139,7 +139,7 @@ def trt_infer():
 
     print ("Start TensorRT Test...")
     correct, total = do_test(context)
-    print('INT8 acc: {}'.format(correct / total))
+    print('INT8 acc: {}'.format(correct / float(total)))
 
 
 if __name__ == '__main__':
@@ -149,7 +149,7 @@ if __name__ == '__main__':
 
         # Translate Pytorch Model into Onnx Model
         dummy_input = Variable(torch.randn(args.batch_size, args.input_channel, \
-                args.input_size, args.input_size, device='cuda'))
+                args.input_size, args.input_size).cuda())
         output_names = ["output"]
         torch.onnx.export(model, dummy_input, args.onnx_model_name, verbose=False,
                           output_names=output_names)
